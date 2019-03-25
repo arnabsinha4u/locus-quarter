@@ -49,6 +49,7 @@ Now, when I wake up in the morning, I have an email which
 # Getting started
 ### Get your Google API Key
 - [Get your Google API key to access Google Maps & Geolocation Services](https://developers.google.com/maps/documentation/embed/get-api-key) - Select Maps, Routes, Directions (all options)
+- Note: Google API has now imposed limits on free usage for the developer community, check your quota limits and use it cautiously.
 
 ### Configuring GMail for Email (Optional)
 Note: Email is optional (default off). I have done this since I found the setup of gmail, tricky for beginners
