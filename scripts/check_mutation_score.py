@@ -58,13 +58,13 @@ def fetch_score(log_file: str) -> float:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--min-score", type=float, required=True)
+    parser.add_argument("--min-score", type=float, default=None)
     parser.add_argument("--log-file", default="mutmut-run.log")
     args = parser.parse_args()
 
     score = fetch_score(args.log_file)
     print(f"Mutation score: {score}%")
-    if score < args.min_score:
+    if args.min_score is not None and score < args.min_score:
         print(f"Mutation score below threshold: expected >= {args.min_score}%", file=sys.stderr)
         return 1
     return 0

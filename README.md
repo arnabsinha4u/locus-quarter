@@ -136,7 +136,7 @@ pip-audit
 Mutation checks:
 ```bash
 mutmut run | tee mutmut-run.log
-python scripts/check_mutation_score.py --min-score 70 --log-file mutmut-run.log
+python scripts/check_mutation_score.py --log-file mutmut-run.log
 ```
 
 Coverage gates:

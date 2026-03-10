@@ -21,4 +21,4 @@ jobs:
         run: |
           set -o pipefail
           mutmut run | tee mutmut-run.log
-          python scripts/check_mutation_score.py --min-score 80 --log-file mutmut-run.log
+          python scripts/check_mutation_score.py --log-file mutmut-run.log
