@@ -16,7 +16,7 @@ def read_totals() -> dict:
         capture_output=True,
         text=True,
     )
-    with open("coverage.json", "r", encoding="utf-8") as fh:
+    with open("coverage.json", encoding="utf-8") as fh:
         payload = json.load(fh)
     return payload.get("totals", {})
 

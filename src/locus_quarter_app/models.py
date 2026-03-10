@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 
 @dataclass(frozen=True)
@@ -58,8 +58,8 @@ class RunArtifact:
     metrics: RunMetrics = field(default_factory=RunMetrics)
 
     @classmethod
-    def new(cls, mode: str, trigger: str = "manual") -> "RunArtifact":
-        started_at = datetime.now(tz=timezone.utc).isoformat()
+    def new(cls, mode: str, trigger: str = "manual") -> RunArtifact:
+        started_at = datetime.now(tz=UTC).isoformat()
         return cls(
             run_id=started_at.replace(":", "-"),
             started_at_utc=started_at,
@@ -68,7 +68,7 @@ class RunArtifact:
         )
 
     def finalize(self) -> None:
-        self.finished_at_utc = datetime.now(tz=timezone.utc).isoformat()
+        self.finished_at_utc = datetime.now(tz=UTC).isoformat()
 
     def to_dict(self) -> dict:
         payload = asdict(self)
