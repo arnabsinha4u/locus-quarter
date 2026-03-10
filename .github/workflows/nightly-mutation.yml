@@ -19,5 +19,5 @@ jobs:
           pip install .[dev]
       - name: Full mutation run
         run: |
-          mutmut run --paths-to-mutate src/locus_quarter --runner "python -m pytest -q"
+          mutmut run --paths-to-mutate src/locus_quarter_app --runner "python -m pytest -q"
           python scripts/check_mutation_score.py --min-score 80

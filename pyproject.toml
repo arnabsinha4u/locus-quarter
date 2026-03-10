@@ -35,7 +35,7 @@ dev = [
 ]
 
 [project.scripts]
-locus-quarter = "locus_quarter:main"
+locus-quarter = "locus_quarter_app.cli:main"
 
 [tool.ruff]
 line-length = 100
@@ -59,13 +59,13 @@ exclude = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "-q --cov=src --cov=locus_quarter.py --cov-report=term-missing --cov-report=xml --cov-branch"
+addopts = "-q --cov=src/locus_quarter_app --cov-report=term-missing --cov-report=xml --cov-branch"
 testpaths = ["test"]
 
 [tool.coverage.run]
 branch = true
 parallel = true
-source = ["src", "locus_quarter.py"]
+source = ["src/locus_quarter_app"]
 
 [tool.coverage.report]
 show_missing = true
@@ -73,7 +73,7 @@ fail_under = 90
 
 [tool.mutmut]
 paths_to_mutate = [
-  "src/locus_quarter",
+  "src/locus_quarter_app",
 ]
 tests_dir = [
   "test",

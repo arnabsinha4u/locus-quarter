@@ -48,7 +48,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install .[dev]
       - name: Pytest with coverage
-        run: pytest -q --cov=src --cov=locus_quarter.py --cov-branch --cov-report=xml --cov-report=term
+        run: pytest -q --cov=src/locus_quarter_app --cov-branch --cov-report=xml --cov-report=term
       - name: Enforce coverage gates
         run: python scripts/check_coverage_gates.py --min-statement 90 --min-branch 80
 
@@ -82,5 +82,5 @@ jobs:
           pip install .[dev]
       - name: Mutation subset gate
         run: |
-          mutmut run --paths-to-mutate src/locus_quarter --runner "python -m pytest -q test/test_mutation_smoke.py"
+          mutmut run --paths-to-mutate src/locus_quarter_app --runner "python -m pytest -q test/test_mutation_smoke.py"
           python scripts/check_mutation_score.py --min-score 70
