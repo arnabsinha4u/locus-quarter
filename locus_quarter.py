@@ -28,6 +28,7 @@ lq_level = 60
 logging.addLevelName(lq_level, "LQ")
 lq_temp_output_filename = 'lq_temp_output.txt'
 lq_logger = logging.getLogger('locus-quarter')
+flags = None
 
 # Create file handler to log output
 lq_fh = logging.FileHandler(filename=lq_temp_output_filename, mode="w")
@@ -89,8 +90,7 @@ class locus_quarter:
         """
         destination_filter_pattern = r"(Te koop: )(.*)"
         for locations in self.g_list_of_regions_urls:
-            feed = feedparser.parse(locations)
-            feed_title = feed['feed']['title']
+            feed = feedparser.parse(locations.strip())
             feed_entries = feed.entries
 
             if len(feed_entries) > 0:
@@ -99,12 +99,17 @@ class locus_quarter:
                         lq_logger.log(lq_level, '+-------------------------------------------------------------+')
                         lq_logger.log(lq_level, entry.link)
                         destination = re.search(destination_filter_pattern, entry.title)
+                        if not destination:
+                            lq_logger.warning("Unable to parse destination title from RSS entry: %s", entry.title)
+                            continue
                         src_lat_lng, src_formatted_address = self.src_geocode(destination.group(2))
                         lq_logger.log(lq_level, src_formatted_address)
-                        lq_logger.log(lq_level, "Date published:%s" %entry.published)
-                        parser = MyHTMLParser()
-                        parser.feed(entry.summary)
-                        parser.close()
+                        lq_logger.log(lq_level, "Date published:%s" %getattr(entry, "published", "unknown"))
+                        summary = getattr(entry, "summary", "")
+                        if summary:
+                            parser = MyHTMLParser()
+                            parser.feed(summary)
+                            parser.close()
                         self.places_nearby_src(src_lat_lng)
                         self.distance_to_office(src_lat_lng)
             else:
@@ -117,6 +122,8 @@ class locus_quarter:
         """
         try:
             src_geocode_result = self.g_google_maps_client_api_client.geocode(house_address)
+            if not src_geocode_result:
+                raise ValueError("No geocoding result received for the address")
             src_formatted_address = src_geocode_result[0]['formatted_address']
             src_lat_lng = src_geocode_result[0]['geometry']['location']
             return src_lat_lng, src_formatted_address
@@ -156,8 +163,8 @@ class locus_quarter:
                 distance = distance_calc['rows'][0]['elements'][0]['distance']['text']
                 duration = distance_calc['rows'][0]['elements'][0]['duration']['text']
                 lq_logger.log(lq_level, "Travel type:%s Distance:%s Time:%s" %(travel_mode, distance, duration))
-            except KeyError:
-                pass
+            except KeyError as key_error:
+                lq_logger.warning("Distance data missing for travel mode %s: %s", travel_mode, key_error)
 
     def distance_to_office(self, p_src_lat_lng):
         """
@@ -170,8 +177,8 @@ class locus_quarter:
                     distance = office_distance_calc['rows'][0]['elements'][num_of_destinations]['distance']['text']
                     duration = office_distance_calc['rows'][0]['elements'][num_of_destinations]['duration']['text']
                     lq_logger.log(lq_level, "Travel type:%s To:%s Distance:%s Time:%s" %(travel_mode, office_distance_calc['destination_addresses'][num_of_destinations], distance, duration))
-            except KeyError:
-                pass
+            except KeyError as key_error:
+                lq_logger.warning("Office distance data missing for travel mode %s: %s", travel_mode, key_error)
 
 
 class mail():
@@ -212,7 +219,6 @@ class mail():
         """
         with open(file=lq_temp_output_filename, mode='r') as fileoutput:
             file_content = fileoutput.read()
-        fileoutput.close()
         self.gmail(file_content, file_content)
 
     def get_credentials(self):
@@ -297,7 +303,7 @@ class mail():
             http = credentials.authorize(httplib2.Http())
             service = discovery.build('gmail', 'v1', http=http)
             to = self.g_receiver_mail_address
-            sender = self.g_receiver_mail_address
+            sender = self.g_sender_mail_address
             subject = self.g_email_subject
             msgHtml = houses_html
             msgPlain = houses_plain
@@ -323,7 +329,7 @@ class MyHTMLParser(HTMLParser):
 @click.command()
 @click.option('--address', default=None)
 @click.option('--config', default='config-locus-quarter.ini')
-@click.option('--email', is_flag=False)
+@click.option('--email/--no-email', default=False)
 def main(address, config, email):
     lq = locus_quarter(config)
 
@@ -346,7 +352,7 @@ def main(address, config, email):
         lq_logger.critical("Execution error: %s" %err)
         raise
 
-    if (email):
+    if email:
         email = mail(config)
         email.send_mail()
         del email
