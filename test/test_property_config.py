@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from hypothesis import given, strategies as st
+
 from locus_quarter_app.config import _parse_list
 
 

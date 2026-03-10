@@ -4,7 +4,13 @@ from pathlib import Path
 
 import pytest
 
-from locus_quarter_app.config import _parse_list, _required, ConfigError, ConfigLoader, resolve_env_value
+from locus_quarter_app.config import (
+    ConfigError,
+    ConfigLoader,
+    _parse_list,
+    _required,
+    resolve_env_value,
+)
 
 
 def test_config_loader_resolves_env_map_key(monkeypatch: pytest.MonkeyPatch) -> None:
