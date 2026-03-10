@@ -82,5 +82,5 @@ jobs:
           pip install .[dev]
       - name: Mutation subset gate
         run: |
-          mutmut run --paths-to-mutate src/locus_quarter_app --runner "python -m pytest -q test/test_mutation_smoke.py"
+          mutmut run
           python scripts/check_mutation_score.py --min-score 70

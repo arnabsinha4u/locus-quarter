@@ -135,7 +135,7 @@ pip-audit
 
 Mutation checks:
 ```bash
-mutmut run --paths-to-mutate src/locus_quarter_app --runner "python -m pytest -q"
+mutmut run
 python scripts/check_mutation_score.py --min-score 70
 ```
 
