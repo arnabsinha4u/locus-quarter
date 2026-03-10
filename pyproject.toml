@@ -36,6 +36,7 @@ dev = [
 
 [project.scripts]
 locus-quarter = "locus_quarter_app.cli:main"
+locus-quarter-scheduled = "locus_quarter_app.schedule:main"
 
 [tool.ruff]
 line-length = 100

@@ -33,9 +33,9 @@ class LocusQuarterService:
         self.feed_client = feed_client
         self.maps_client = maps_client
 
-    def run(self, address: str | None = None) -> tuple[RunArtifact, Reporter]:
+    def run(self, address: str | None = None, trigger: str = "manual") -> tuple[RunArtifact, Reporter]:
         mode = "address" if address else "feed"
-        artifact = RunArtifact.new(mode=mode)
+        artifact = RunArtifact.new(mode=mode, trigger=trigger)
         reporter = Reporter()
         started = time.perf_counter()
         try:

@@ -24,6 +24,8 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(level
 @click.option("--format", "output_format", type=click.Choice(["text", "json"]), default="text")
 @click.option("--output-dir", default="reports", show_default=True, help="Directory for timestamped artifacts.")
 @click.option("--save-artifacts/--no-save-artifacts", default=True, show_default=True)
+@click.option("--trigger", default="manual", show_default=True, help="Run trigger label, e.g. cron/nightly/manual.")
+@click.option("--print-metrics/--no-print-metrics", default=True, show_default=True)
 def main(
     address: str | None,
     config_path: str,
@@ -31,6 +33,8 @@ def main(
     output_format: str,
     output_dir: str,
     save_artifacts: bool,
+    trigger: str,
+    print_metrics: bool,
 ) -> None:
     """Run Locus Quarter analysis."""
     try:
@@ -40,7 +44,7 @@ def main(
             feed_client=FeedParserClient(),
             maps_client=GoogleMapsClient(config.maps_api_key),
         )
-        artifact, reporter = service.run(address=address)
+        artifact, reporter = service.run(address=address, trigger=trigger)
         text_output = reporter.render_text()
 
         if output_format == "json":
@@ -51,6 +55,19 @@ def main(
         if save_artifacts:
             json_path, text_path = Reporter.write_artifacts(output_dir, artifact, text_output)
             logger.info("Artifacts written: json=%s text=%s", json_path, text_path)
+        if print_metrics:
+            logger.info(
+                "Run metrics: trigger=%s houses=%s feeds=%s geocode=%s places=%s distance=%s warnings=%s errors=%s duration_s=%.3f",
+                artifact.trigger,
+                artifact.metrics.houses_processed,
+                artifact.metrics.feed_entries_seen,
+                artifact.metrics.geocode_calls,
+                artifact.metrics.places_calls,
+                artifact.metrics.distance_calls,
+                artifact.metrics.warnings,
+                artifact.metrics.errors,
+                artifact.metrics.duration_seconds,
+            )
 
         if email:
             if not config.email.receiver_mail_address or not config.email.sender_mail_address:

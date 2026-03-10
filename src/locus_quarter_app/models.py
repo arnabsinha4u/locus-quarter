@@ -53,13 +53,19 @@ class RunArtifact:
     started_at_utc: str
     finished_at_utc: str | None = None
     mode: str = "feed"
+    trigger: str = "manual"
     records: list[dict] = field(default_factory=list)
     metrics: RunMetrics = field(default_factory=RunMetrics)
 
     @classmethod
-    def new(cls, mode: str) -> "RunArtifact":
+    def new(cls, mode: str, trigger: str = "manual") -> "RunArtifact":
         started_at = datetime.now(tz=timezone.utc).isoformat()
-        return cls(run_id=started_at.replace(":", "-"), started_at_utc=started_at, mode=mode)
+        return cls(
+            run_id=started_at.replace(":", "-"),
+            started_at_utc=started_at,
+            mode=mode,
+            trigger=trigger,
+        )
 
     def finalize(self) -> None:
         self.finished_at_utc = datetime.now(tz=timezone.utc).isoformat()
