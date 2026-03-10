@@ -82,5 +82,6 @@ jobs:
           pip install .[dev]
       - name: Mutation subset gate
         run: |
-          mutmut run
-          python scripts/check_mutation_score.py --min-score 70
+          set -o pipefail
+          mutmut run | tee mutmut-run.log
+          python scripts/check_mutation_score.py --min-score 70 --log-file mutmut-run.log
