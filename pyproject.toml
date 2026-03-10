@@ -79,7 +79,7 @@ paths_to_mutate = [
 tests_dir = [
   "test",
 ]
-runner = "python -m pytest -q"
+runner = "python -m pytest -q -o addopts= test/test_mutation_smoke.py"
 backup = false
 
 [tool.hatch.build.targets.wheel]
