@@ -53,5 +53,7 @@ class GoogleMapsClient(MapsClient):
         mode: str,
         destinations: list[dict[str, float]] | list[str] | dict[str, float],
     ) -> dict[str, Any]:
-        payload = self._client.distance_matrix(origins=origins, mode=mode, destinations=destinations)
+        payload = self._client.distance_matrix(
+            origins=origins, mode=mode, destinations=destinations
+        )
         return cast(dict[str, Any], payload)

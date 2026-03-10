@@ -11,7 +11,9 @@ from locus_quarter_app.reporting import Reporter
 from test.fakes import FakeFeedClient, FakeMapsClient
 
 
-def _config(receiver: str | None = "to@example.com", sender: str | None = "from@example.com") -> AppConfig:
+def _config(
+    receiver: str | None = "to@example.com", sender: str | None = "from@example.com"
+) -> AppConfig:
     return AppConfig(
         query=QueryConfig(
             regions_urls=["https://example.test/feed"],
@@ -62,7 +64,9 @@ def test_cli_returns_1_and_json_error_for_unhandled_exception(monkeypatch) -> No
 
 def test_cli_writes_artifacts_when_enabled(monkeypatch) -> None:
     monkeypatch.setattr("locus_quarter_app.cli.ConfigLoader.load", lambda self: _config())
-    monkeypatch.setattr("locus_quarter_app.cli.FeedParserClient", lambda: FakeFeedClient(entries=[]))
+    monkeypatch.setattr(
+        "locus_quarter_app.cli.FeedParserClient", lambda: FakeFeedClient(entries=[])
+    )
     monkeypatch.setattr("locus_quarter_app.cli.GoogleMapsClient", lambda api_key: FakeMapsClient())
     monkeypatch.setattr(
         "locus_quarter_app.cli.Reporter.write_artifacts",
@@ -75,7 +79,9 @@ def test_cli_writes_artifacts_when_enabled(monkeypatch) -> None:
 
 def test_cli_no_print_metrics_branch(monkeypatch) -> None:
     monkeypatch.setattr("locus_quarter_app.cli.ConfigLoader.load", lambda self: _config())
-    monkeypatch.setattr("locus_quarter_app.cli.FeedParserClient", lambda: FakeFeedClient(entries=[]))
+    monkeypatch.setattr(
+        "locus_quarter_app.cli.FeedParserClient", lambda: FakeFeedClient(entries=[])
+    )
     monkeypatch.setattr("locus_quarter_app.cli.GoogleMapsClient", lambda api_key: FakeMapsClient())
     result = CliRunner().invoke(main, ["--no-print-metrics", "--no-save-artifacts"])
     assert result.exit_code == 0
@@ -83,7 +89,9 @@ def test_cli_no_print_metrics_branch(monkeypatch) -> None:
 
 def test_cli_email_requires_sender_receiver(monkeypatch) -> None:
     monkeypatch.setattr("locus_quarter_app.cli.ConfigLoader.load", lambda self: _config(None, None))
-    monkeypatch.setattr("locus_quarter_app.cli.FeedParserClient", lambda: FakeFeedClient(entries=[]))
+    monkeypatch.setattr(
+        "locus_quarter_app.cli.FeedParserClient", lambda: FakeFeedClient(entries=[])
+    )
     monkeypatch.setattr("locus_quarter_app.cli.GoogleMapsClient", lambda api_key: FakeMapsClient())
     result = CliRunner().invoke(main, ["--email", "--no-save-artifacts"])
     assert result.exit_code == 2
@@ -105,7 +113,9 @@ def test_cli_exits_when_metrics_contains_errors(monkeypatch) -> None:
 
     monkeypatch.setattr("locus_quarter_app.cli.ConfigLoader.load", lambda self: _config())
     monkeypatch.setattr("locus_quarter_app.cli.LocusQuarterService", _FailingService)
-    monkeypatch.setattr("locus_quarter_app.cli.FeedParserClient", lambda: FakeFeedClient(entries=[]))
+    monkeypatch.setattr(
+        "locus_quarter_app.cli.FeedParserClient", lambda: FakeFeedClient(entries=[])
+    )
     monkeypatch.setattr("locus_quarter_app.cli.GoogleMapsClient", lambda api_key: FakeMapsClient())
     result = CliRunner().invoke(main, ["--no-save-artifacts", "--no-print-metrics"])
     assert result.exit_code == 1

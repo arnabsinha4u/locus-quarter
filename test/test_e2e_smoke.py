@@ -32,7 +32,9 @@ def test_e2e_smoke_json_output(monkeypatch) -> None:
         raw_config_path="x",
     )
     monkeypatch.setattr("locus_quarter_app.cli.ConfigLoader.load", lambda self: config)
-    monkeypatch.setattr("locus_quarter_app.cli.FeedParserClient", lambda: FakeFeedClient(entries=[]))
+    monkeypatch.setattr(
+        "locus_quarter_app.cli.FeedParserClient", lambda: FakeFeedClient(entries=[])
+    )
     monkeypatch.setattr("locus_quarter_app.cli.GoogleMapsClient", lambda api_key: FakeMapsClient())
 
     runner = CliRunner()

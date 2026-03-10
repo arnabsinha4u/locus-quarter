@@ -33,7 +33,9 @@ class LocusQuarterService:
         self.feed_client = feed_client
         self.maps_client = maps_client
 
-    def run(self, address: str | None = None, trigger: str = "manual") -> tuple[RunArtifact, Reporter]:
+    def run(
+        self, address: str | None = None, trigger: str = "manual"
+    ) -> tuple[RunArtifact, Reporter]:
         mode = "address" if address else "feed"
         artifact = RunArtifact.new(mode=mode, trigger=trigger)
         reporter = Reporter()
@@ -170,7 +172,9 @@ class LocusQuarterService:
         reporter.add("Fixed Addresses")
         for mode in self.config.query.office_travel_modes:
             artifact.metrics.distance_calls += 1
-            matrix = self.maps_client.distance_matrix(src_lat_lng, mode, self.config.query.office_addresses)
+            matrix = self.maps_client.distance_matrix(
+                src_lat_lng, mode, self.config.query.office_addresses
+            )
             destination_addresses = matrix.get("destination_addresses", [])
             rows = matrix.get("rows", [])
             if not rows:

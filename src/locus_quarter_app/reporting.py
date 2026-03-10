@@ -21,7 +21,9 @@ class Reporter:
         return json.dumps(artifact.to_dict(), ensure_ascii=False, indent=2, sort_keys=True)
 
     @staticmethod
-    def write_artifacts(output_dir: str, artifact: RunArtifact, text_output: str) -> tuple[Path, Path]:
+    def write_artifacts(
+        output_dir: str, artifact: RunArtifact, text_output: str
+    ) -> tuple[Path, Path]:
         directory = Path(output_dir)
         directory.mkdir(parents=True, exist_ok=True)
         json_path = directory / f"{artifact.run_id}.json"

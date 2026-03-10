@@ -19,7 +19,9 @@ class _FakeCreds:
         return '{"token": "x"}'
 
 
-def _cfg(client_secret_file: str | None, secrets_path: str = ".", token_json: str = "tmp-token.json") -> EmailConfig:
+def _cfg(
+    client_secret_file: str | None, secrets_path: str = ".", token_json: str = "tmp-token.json"
+) -> EmailConfig:
     return EmailConfig(
         secrets_path=secrets_path,
         token_json=token_json,
@@ -81,7 +83,9 @@ def test_gmail_client_refreshes_expired_token(monkeypatch, tmp_path: Path) -> No
         "locus_quarter_app.emailer.Credentials.from_authorized_user_file",
         lambda path, scopes: _FakeCreds(valid=False, expired=True, refresh_token="refresh-token"),
     )
-    client = GmailClient(_cfg(client_secret_file=None, secrets_path=str(tmp_path), token_json="token.json"))
+    client = GmailClient(
+        _cfg(client_secret_file=None, secrets_path=str(tmp_path), token_json="token.json")
+    )
     creds = client._credentials()
     assert creds.valid is True
 

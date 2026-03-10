@@ -38,7 +38,9 @@ def test_cli_json_output(monkeypatch) -> None:
     runner = CliRunner()
 
     monkeypatch.setattr("locus_quarter_app.cli.ConfigLoader.load", lambda self: _config())
-    monkeypatch.setattr("locus_quarter_app.cli.FeedParserClient", lambda: FakeFeedClient(entries=[]))
+    monkeypatch.setattr(
+        "locus_quarter_app.cli.FeedParserClient", lambda: FakeFeedClient(entries=[])
+    )
     monkeypatch.setattr("locus_quarter_app.cli.GoogleMapsClient", lambda api_key: FakeMapsClient())
 
     result = runner.invoke(main, ["--format", "json", "--no-save-artifacts"])

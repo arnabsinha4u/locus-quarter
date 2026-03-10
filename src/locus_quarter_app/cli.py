@@ -13,7 +13,9 @@ from locus_quarter_app.service import LocusQuarterService
 
 
 logger = logging.getLogger("locus-quarter")
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 
 
 @click.command()
@@ -21,9 +23,19 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(level
 @click.option("--config", "config_path", default="config-locus-quarter.ini", show_default=True)
 @click.option("--email/--no-email", default=False, show_default=True)
 @click.option("--format", "output_format", type=click.Choice(["text", "json"]), default="text")
-@click.option("--output-dir", default="reports", show_default=True, help="Directory for timestamped artifacts.")
+@click.option(
+    "--output-dir",
+    default="reports",
+    show_default=True,
+    help="Directory for timestamped artifacts.",
+)
 @click.option("--save-artifacts/--no-save-artifacts", default=True, show_default=True)
-@click.option("--trigger", default="manual", show_default=True, help="Run trigger label, e.g. cron/nightly/manual.")
+@click.option(
+    "--trigger",
+    default="manual",
+    show_default=True,
+    help="Run trigger label, e.g. cron/nightly/manual.",
+)
 @click.option("--print-metrics/--no-print-metrics", default=True, show_default=True)
 def main(
     address: str | None,

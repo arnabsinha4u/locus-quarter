@@ -56,14 +56,18 @@ class ConfigLoader:
             raise ConfigError(f"Configuration file not found: {self.path}")
 
         query = QueryConfig(
-            regions_urls=_parse_list(parser.get("LOCUS-QUARTER", "g_list_of_regions_urls"), "g_list_of_regions_urls"),
+            regions_urls=_parse_list(
+                parser.get("LOCUS-QUARTER", "g_list_of_regions_urls"), "g_list_of_regions_urls"
+            ),
             nearby_place_types=_parse_list(
                 parser.get("LOCUS-QUARTER", "g_list_nearby_types_of_places"),
                 "g_list_nearby_types_of_places",
             ),
             travel_modes=_parse_list(parser.get("LOCUS-QUARTER", "g_travel_mode"), "g_travel_mode"),
             limit_houses=parser.getint("LOCUS-QUARTER", "g_limit_houses"),
-            limit_search_places_nearby=parser.getint("LOCUS-QUARTER", "g_limit_search_places_nearby"),
+            limit_search_places_nearby=parser.getint(
+                "LOCUS-QUARTER", "g_limit_search_places_nearby"
+            ),
             office_addresses=_parse_list(
                 parser.get("LOCUS-QUARTER", "g_office_addresses"),
                 "g_office_addresses",
@@ -85,12 +89,18 @@ class ConfigLoader:
         email = EmailConfig(
             secrets_path=parser.get("EMAIL", "g_gmail_secrets_path", fallback="."),
             token_json=parser.get("EMAIL", "g_gmail_secret_json", fallback="gmail-token.json"),
-            action_scope=parser.get("EMAIL", "g_gmail_action_scope", fallback="https://www.googleapis.com/auth/gmail.send"),
+            action_scope=parser.get(
+                "EMAIL",
+                "g_gmail_action_scope",
+                fallback="https://www.googleapis.com/auth/gmail.send",
+            ),
             client_secret_file=resolve_env_value(
                 parser.get("EMAIL", "g_gmail_client_secret_file", fallback=""),
                 "LQ_GMAIL_CLIENT_SECRET_FILE",
             ),
-            application_name=parser.get("EMAIL", "g_gmail_google_developer_application_name", fallback="locus-quarter"),
+            application_name=parser.get(
+                "EMAIL", "g_gmail_google_developer_application_name", fallback="locus-quarter"
+            ),
             receiver_mail_address=resolve_env_value(
                 parser.get("EMAIL", "g_receiver_mail_address", fallback=""),
                 "LQ_RECEIVER_MAIL_ADDRESS",
@@ -102,4 +112,6 @@ class ConfigLoader:
             email_subject=parser.get("EMAIL", "g_email_subject", fallback="Locus Quarter"),
         )
 
-        return AppConfig(query=query, maps_api_key=maps_api_key, email=email, raw_config_path=self.path)
+        return AppConfig(
+            query=query, maps_api_key=maps_api_key, email=email, raw_config_path=self.path
+        )

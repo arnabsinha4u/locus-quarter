@@ -37,7 +37,9 @@ class GmailClient(MailClient):
                         "Gmail client secret file is required when no valid token exists. "
                         "Set EMAIL:g_gmail_client_secret_file or LQ_GMAIL_CLIENT_SECRET_FILE."
                     )
-                flow = InstalledAppFlow.from_client_secrets_file(self.config.client_secret_file, scopes)
+                flow = InstalledAppFlow.from_client_secrets_file(
+                    self.config.client_secret_file, scopes
+                )
                 creds = flow.run_local_server(port=0)
             with open(token_path, "w", encoding="utf-8") as token_file:
                 token_file.write(creds.to_json())

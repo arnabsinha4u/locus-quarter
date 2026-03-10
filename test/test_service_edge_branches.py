@@ -93,7 +93,9 @@ class _OfficeRowsMissingMapsClient:
     def distance_matrix(origins: dict[str, float], mode: str, destinations):  # noqa: ARG004
         if isinstance(destinations, list):
             return {"destination_addresses": destinations, "rows": []}
-        return {"rows": [{"elements": [{"distance": {"text": "1 km"}, "duration": {"text": "2 mins"}}]}]}
+        return {
+            "rows": [{"elements": [{"distance": {"text": "1 km"}, "duration": {"text": "2 mins"}}]}]
+        }
 
 
 def test_service_warns_when_office_rows_missing() -> None:
@@ -125,7 +127,9 @@ class _OfficeElementsMissingMapsClient:
                 "destination_addresses": destinations,
                 "rows": [{"elements": [{}]}],
             }
-        return {"rows": [{"elements": [{"distance": {"text": "1 km"}, "duration": {"text": "2 mins"}}]}]}
+        return {
+            "rows": [{"elements": [{"distance": {"text": "1 km"}, "duration": {"text": "2 mins"}}]}]
+        }
 
 
 def test_service_warns_when_office_distance_fields_missing() -> None:

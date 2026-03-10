@@ -36,10 +36,16 @@ def test_google_maps_client_calls_underlying_library(monkeypatch) -> None:
             ]
 
         def places_nearby(self, location, type, rank_by):  # noqa: A002
-            return {"results": [{"name": "School", "geometry": {"location": {"lat": 1.1, "lng": 2.2}}}]}
+            return {
+                "results": [{"name": "School", "geometry": {"location": {"lat": 1.1, "lng": 2.2}}}]
+            }
 
         def distance_matrix(self, origins, mode, destinations):
-            return {"rows": [{"elements": [{"distance": {"text": "1 km"}, "duration": {"text": "2 mins"}}]}]}
+            return {
+                "rows": [
+                    {"elements": [{"distance": {"text": "1 km"}, "duration": {"text": "2 mins"}}]}
+                ]
+            }
 
     monkeypatch.setattr("locus_quarter_app.adapters.googlemaps.Client", _FakeGoogleClient)
     client = GoogleMapsClient("fake-key")

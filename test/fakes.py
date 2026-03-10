@@ -47,7 +47,9 @@ class FakeMapsClient:
                 "rows": [{"elements": elements}],
             }
         return {
-            "rows": [{"elements": [{"distance": {"text": "0.8 km"}, "duration": {"text": "10 mins"}}]}]
+            "rows": [
+                {"elements": [{"distance": {"text": "0.8 km"}, "duration": {"text": "10 mins"}}]}
+            ]
         }
 
 
