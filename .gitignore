@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.hypothesis/
+.mutmut-cache/
+htmlcov/
+.tox/
+.nox/
+dist/
+build/
+*.egg-info/
+.env
+reports/

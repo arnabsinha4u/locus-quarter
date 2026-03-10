@@ -1,0 +1,82 @@
+[build-system]
+requires = ["hatchling>=1.24.2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "locus-quarter"
+version = "0.1.0"
+description = "Automated location scoring for property search with nearby places and commute distance."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [{ name = "Locus Quarter contributors" }]
+dependencies = [
+  "click>=8.1.7",
+  "feedparser>=6.0.11",
+  "google-api-python-client>=2.170.0",
+  "google-auth>=2.40.0",
+  "google-auth-httplib2>=0.2.0",
+  "google-auth-oauthlib>=1.2.2",
+  "googlemaps>=4.10.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "detect-secrets>=1.5.0",
+  "hypothesis>=6.119.0",
+  "mypy>=1.15.0",
+  "mutmut>=3.2.3",
+  "pip-audit>=2.8.0",
+  "pre-commit>=4.0.1",
+  "pytest>=8.3.4",
+  "pytest-cov>=6.0.0",
+  "ruff>=0.9.3",
+  "types-requests>=2.32.0.20250306",
+]
+
+[project.scripts]
+locus-quarter = "locus_quarter:main"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N", "W"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_unused_ignores = true
+warn_return_any = true
+warn_unreachable = true
+strict_optional = true
+check_untyped_defs = true
+disallow_any_generics = false
+ignore_missing_imports = true
+exclude = [
+  "^test/",
+]
+
+[tool.pytest.ini_options]
+addopts = "-q --cov=src --cov=locus_quarter.py --cov-report=term-missing --cov-report=xml --cov-branch"
+testpaths = ["test"]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = ["src", "locus_quarter.py"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 90
+
+[tool.mutmut]
+paths_to_mutate = [
+  "src/locus_quarter",
+]
+tests_dir = [
+  "test",
+]
+runner = "python -m pytest -q"
+backup = false
