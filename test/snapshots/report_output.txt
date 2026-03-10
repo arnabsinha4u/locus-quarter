@@ -1,0 +1,9 @@
++-------------------------------------------------------------+
+https://example.test/a
+A (formatted)
+Date published:today
+80 m2
+Facility Type:school
+Facility Name:school one
+Travel type:walking Distance:0.8 km Time:10 mins
++-------------------------------------------------------------+
