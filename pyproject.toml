@@ -60,7 +60,7 @@ exclude = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "-q --cov=src/locus_quarter_app --cov-report=term-missing --cov-report=xml --cov-branch"
+addopts = "-q"
 testpaths = ["test"]
 
 [tool.coverage.run]
