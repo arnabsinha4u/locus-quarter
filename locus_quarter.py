@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+from typing import Any, cast
 
 
 def _ensure_src_on_path() -> None:
@@ -18,7 +19,8 @@ def main() -> None:
     _ensure_src_on_path()
     from locus_quarter_app.cli import main as cli_main
 
-    cli_main(standalone_mode=True)
+    command = cast(Any, cli_main)
+    command(standalone_mode=True)
 
 
 if __name__ == "__main__":

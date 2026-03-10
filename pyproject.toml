@@ -81,3 +81,20 @@ tests_dir = [
 ]
 runner = "python -m pytest -q"
 backup = false
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/locus_quarter_app"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "src/locus_quarter_app",
+  "locus_quarter.py",
+  "README.md",
+  "LICENSE",
+  "config-locus-quarter.ini",
+  "config-mini-locus-quarter.ini",
+  "example-config-locus-quarter.ini",
+  "test",
+  "scripts",
+  ".github/workflows",
+]
