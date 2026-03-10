@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 import time
 from html.parser import HTMLParser
-from typing import Any
+from typing import Any, cast
 
 from locus_quarter_app.interfaces import FeedClient, MapsClient
 from locus_quarter_app.models import AppConfig, RunArtifact
@@ -205,10 +205,16 @@ class LocusQuarterService:
 
     @staticmethod
     def _first_element(distance_matrix_payload: dict[str, Any]) -> dict[str, Any] | None:
-        rows = distance_matrix_payload.get("rows", [])
-        if not rows:
+        rows = distance_matrix_payload.get("rows")
+        if not isinstance(rows, list) or not rows:
             return None
-        elements = rows[0].get("elements", [])
-        if not elements:
+        first_row = rows[0]
+        if not isinstance(first_row, dict):
             return None
-        return elements[0]
+        elements = first_row.get("elements")
+        if not isinstance(elements, list) or not elements:
+            return None
+        first_element = elements[0]
+        if not isinstance(first_element, dict):
+            return None
+        return cast(dict[str, Any], first_element)

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 import feedparser
 import googlemaps
@@ -38,7 +38,14 @@ class GoogleMapsClient(MapsClient):
 
     def places_nearby(self, location: dict[str, float], place_type: str) -> list[dict[str, Any]]:
         result = self._client.places_nearby(location=location, type=place_type, rank_by="distance")
-        return result.get("results", [])
+        raw_results = result.get("results", [])
+        if not isinstance(raw_results, list):
+            return []
+        typed_results: list[dict[str, Any]] = []
+        for item in raw_results:
+            if isinstance(item, dict):
+                typed_results.append(cast(dict[str, Any], item))
+        return typed_results
 
     def distance_matrix(
         self,
@@ -46,4 +53,5 @@ class GoogleMapsClient(MapsClient):
         mode: str,
         destinations: list[dict[str, float]] | list[str] | dict[str, float],
     ) -> dict[str, Any]:
-        return self._client.distance_matrix(origins=origins, mode=mode, destinations=destinations)
+        payload = self._client.distance_matrix(origins=origins, mode=mode, destinations=destinations)
+        return cast(dict[str, Any], payload)
