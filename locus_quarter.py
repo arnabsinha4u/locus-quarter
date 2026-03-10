@@ -12,23 +12,36 @@ import click
 import logging
 
 #Libraries required for emailing
-import httplib2
 import os
-from oauth2client import client
-from oauth2client import tools
-from oauth2client.file import Storage
-from oauth2client import client, tools
 import base64
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from apiclient import errors, discovery
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient import errors, discovery
 
 # Create logger and level
 lq_level = 60
 logging.addLevelName(lq_level, "LQ")
 lq_temp_output_filename = 'lq_temp_output.txt'
 lq_logger = logging.getLogger('locus-quarter')
-flags = None
+
+
+def _resolve_env_value(raw_value, default_env_var):
+    """
+    Resolve values from env placeholders in config.
+    Supported format: env:VARNAME
+    """
+    if raw_value is None:
+        return os.getenv(default_env_var)
+    value = str(raw_value).strip()
+    if value.startswith("env:"):
+        env_name = value.split("env:", 1)[1].strip()
+        return os.getenv(env_name)
+    if value in ("", "CHANGE_ME", "REPLACE_ME"):
+        return os.getenv(default_env_var)
+    return value
 
 # Create file handler to log output
 lq_fh = logging.FileHandler(filename=lq_temp_output_filename, mode="w")
@@ -71,7 +84,15 @@ class locus_quarter:
             self.g_office_travel_mode = ast.literal_eval(parser.get('LOCUS-QUARTER', 'g_office_travel_mode'))
 
             #List of variables for configuring Google Developer Account for API access
-            self.g_google_maps_client_api_key = parser.get('GOOGLE-API', 'g_google_maps_client_api_key')
+            self.g_google_maps_client_api_key = _resolve_env_value(
+                parser.get('GOOGLE-API', 'g_google_maps_client_api_key'),
+                "LQ_GOOGLE_MAPS_API_KEY",
+            )
+            if not self.g_google_maps_client_api_key:
+                raise ValueError(
+                    "Google Maps API key not configured. "
+                    "Use GOOGLE-API:g_google_maps_client_api_key=env:LQ_GOOGLE_MAPS_API_KEY"
+                )
             self.g_google_maps_client_api_client = googlemaps.Client(key=self.g_google_maps_client_api_key)
         except configparser.DuplicateOptionError as ErrDupConfigVal:
             lq_logger.critical('Duplicate value found %s' %ErrDupConfigVal)
@@ -200,10 +221,19 @@ class mail():
             self.g_gmail_secrets_path = parser.get('EMAIL', 'g_gmail_secrets_path')
             self.g_gmail_secret_json = parser.get('EMAIL', 'g_gmail_secret_json')
             self.g_gmail_action_scope = parser.get('EMAIL', 'g_gmail_action_scope')
-            self.g_gmail_client_secret_file = parser.get('EMAIL', 'g_gmail_client_secret_file')
+            self.g_gmail_client_secret_file = _resolve_env_value(
+                parser.get('EMAIL', 'g_gmail_client_secret_file'),
+                "LQ_GMAIL_CLIENT_SECRET_FILE",
+            )
             self.g_gmail_google_developer_application_name = parser.get('EMAIL', 'g_gmail_google_developer_application_name')
-            self.g_receiver_mail_address = parser.get('EMAIL', 'g_receiver_mail_address')
-            self.g_sender_mail_address = parser.get('EMAIL', 'g_sender_mail_address')
+            self.g_receiver_mail_address = _resolve_env_value(
+                parser.get('EMAIL', 'g_receiver_mail_address'),
+                "LQ_RECEIVER_MAIL_ADDRESS",
+            )
+            self.g_sender_mail_address = _resolve_env_value(
+                parser.get('EMAIL', 'g_sender_mail_address'),
+                "LQ_SENDER_MAIL_ADDRESS",
+            )
             self.g_email_subject = parser.get('EMAIL', 'g_email_subject')
 
         except configparser.DuplicateOptionError as ErrDupConfigVal:
@@ -237,19 +267,24 @@ class mail():
                 os.makedirs(credential_dir)
             credential_path = os.path.join(credential_dir,
                                         self.g_gmail_secret_json)
-        
-        
 
-            store = Storage(credential_path)
-            credentials = store.get()
-            if not credentials or credentials.invalid:
-                flow = client.flow_from_clientsecrets(self.g_gmail_client_secret_file, self.g_gmail_action_scope)
-                flow.user_agent = self.g_gmail_google_developer_application_name
-                if flags:
-                    credentials = tools.run_flow(flow, store, flags)
-                else: # Needed only for compatibility with Python 2.6
-                    credentials = tools.run(flow, store)
-                print('Storing credentials to ' + credential_path)
+            scopes = [scope.strip() for scope in self.g_gmail_action_scope.split(",") if scope.strip()]
+            credentials = None
+            if os.path.exists(credential_path):
+                credentials = Credentials.from_authorized_user_file(credential_path, scopes)
+
+            if not credentials or not credentials.valid:
+                if credentials and credentials.expired and credentials.refresh_token:
+                    credentials.refresh(Request())
+                else:
+                    flow = InstalledAppFlow.from_client_secrets_file(
+                        self.g_gmail_client_secret_file,
+                        scopes,
+                    )
+                    credentials = flow.run_local_server(port=0)
+                with open(credential_path, "w", encoding="utf-8") as token_file:
+                    token_file.write(credentials.to_json())
+                lq_logger.info("Stored refreshed Gmail credentials to %s", credential_path)
             return credentials
         except PermissionError as PermErr:
             lq_logger.critical('Permission on path denied error/Path does not exist %s' %PermErr)
@@ -274,8 +309,7 @@ class mail():
         Create connection and compose mail
         """
         credentials = self.get_credentials()
-        http = credentials.authorize(httplib2.Http())
-        service = discovery.build('gmail', 'v1', http=http)
+        service = discovery.build('gmail', 'v1', credentials=credentials)
         message1 = self.CreateMessage(sender, to, subject, msgHtml, msgPlain)
         self.SendMessageInternal(service, "me", message1)
 
@@ -299,9 +333,6 @@ class mail():
         of the user's Gmail account.
         """
         try:
-            credentials = self.get_credentials()
-            http = credentials.authorize(httplib2.Http())
-            service = discovery.build('gmail', 'v1', http=http)
             to = self.g_receiver_mail_address
             sender = self.g_sender_mail_address
             subject = self.g_email_subject
