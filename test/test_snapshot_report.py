@@ -8,6 +8,18 @@ from locus_quarter_app.service import LocusQuarterService
 from test.fakes import FakeFeedClient, FakeMapsClient
 
 
+def _resolve_repo_file(relative_path: str) -> Path:
+    candidates = [
+        Path(relative_path),
+        Path(__file__).resolve().parents[1] / relative_path,
+        Path(__file__).resolve().parents[2] / relative_path,
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    raise FileNotFoundError(f"Could not resolve repository file: {relative_path}")
+
+
 def test_report_snapshot_matches_expected() -> None:
     config = AppConfig(
         query=QueryConfig(
@@ -47,5 +59,5 @@ def test_report_snapshot_matches_expected() -> None:
         maps_client=FakeMapsClient(),
     )
     _, reporter = service.run()
-    expected = Path("test/snapshots/report_output.txt").read_text(encoding="utf-8")
+    expected = _resolve_repo_file("test/snapshots/report_output.txt").read_text(encoding="utf-8")
     assert reporter.render_text() == expected

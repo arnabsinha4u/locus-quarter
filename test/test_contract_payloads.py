@@ -6,8 +6,20 @@ from pathlib import Path
 from locus_quarter_app.service import LocusQuarterService
 
 
+def _resolve_repo_file(relative_path: str) -> Path:
+    candidates = [
+        Path(relative_path),
+        Path(__file__).resolve().parents[1] / relative_path,
+        Path(__file__).resolve().parents[2] / relative_path,
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    raise FileNotFoundError(f"Could not resolve repository file: {relative_path}")
+
+
 def _load_fixture(name: str) -> dict:
-    path = Path("test/fixtures") / name
+    path = _resolve_repo_file(f"test/fixtures/{name}")
     return json.loads(path.read_text(encoding="utf-8"))
 
 
