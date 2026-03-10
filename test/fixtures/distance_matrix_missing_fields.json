@@ -1,0 +1,12 @@
+{
+  "destination_addresses": ["Office 1"],
+  "rows": [
+    {
+      "elements": [
+        {
+          "status": "ZERO_RESULTS"
+        }
+      ]
+    }
+  ]
+}

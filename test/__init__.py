@@ -1,1 +1,1 @@
-all = ['test_geocode']
+"""Test package."""

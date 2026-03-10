@@ -1,0 +1,13 @@
+{
+  "destination_addresses": ["Office 1"],
+  "rows": [
+    {
+      "elements": [
+        {
+          "distance": { "text": "8.1 km" },
+          "duration": { "text": "15 mins" }
+        }
+      ]
+    }
+  ]
+}
