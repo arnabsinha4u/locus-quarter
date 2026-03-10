@@ -4,6 +4,7 @@ import json
 import logging
 
 import click
+
 from locus_quarter_app.adapters import FeedParserClient, GoogleMapsClient
 from locus_quarter_app.config import ConfigError, ConfigLoader
 from locus_quarter_app.emailer import GmailClient
