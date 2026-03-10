@@ -46,6 +46,9 @@ target-version = "py311"
 select = ["E", "F", "I", "B", "UP", "N", "W"]
 ignore = ["E501"]
 
+[tool.ruff.lint.isort]
+known-first-party = ["locus_quarter_app", "test"]
+
 [tool.mypy]
 python_version = "3.11"
 warn_unused_ignores = true
