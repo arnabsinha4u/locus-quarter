@@ -13,9 +13,27 @@ from locus_quarter_app.config import (
 )
 
 
-def test_config_loader_resolves_env_map_key(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_config_loader_resolves_env_map_key(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
     monkeypatch.setenv("LQ_GOOGLE_MAPS_API_KEY", "test-google-maps-key")
-    config = ConfigLoader("config-mini-locus-quarter.ini").load()
+    config_path = tmp_path / "config.ini"
+    config_path.write_text(
+        """[LOCUS-QUARTER]
+g_list_of_regions_urls = ["https://example.test/feed"]
+g_list_nearby_types_of_places = ["school"]
+g_travel_mode = ["walking"]
+g_limit_houses = 1
+g_limit_search_places_nearby = 1
+g_office_addresses = []
+g_office_travel_mode = []
+[GOOGLE-API]
+g_google_maps_client_api_key = env:LQ_GOOGLE_MAPS_API_KEY
+""",
+        encoding="utf-8",
+    )
+    config = ConfigLoader(str(config_path)).load()
     assert config.maps_api_key == "test-google-maps-key"
 
 
