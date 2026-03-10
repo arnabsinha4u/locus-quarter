@@ -48,3 +48,30 @@ def test_google_maps_client_calls_underlying_library(monkeypatch) -> None:
     assert lat_lng["lat"] == 1.0
     assert client.places_nearby({"lat": 1.0, "lng": 2.0}, "school")
     assert client.distance_matrix({"lat": 1.0, "lng": 2.0}, "walking", {"lat": 1.1, "lng": 2.2})
+
+
+def test_google_maps_client_geocode_raises_on_empty_result(monkeypatch) -> None:
+    class _FakeGoogleClient:
+        def __init__(self, key: str):  # noqa: ARG002
+            pass
+
+        @staticmethod
+        def geocode(address: str):  # noqa: ARG004
+            return []
+
+        @staticmethod
+        def places_nearby(location, type, rank_by):  # noqa: ARG004, A002
+            return {"results": []}
+
+        @staticmethod
+        def distance_matrix(origins, mode, destinations):  # noqa: ARG004
+            return {"rows": []}
+
+    monkeypatch.setattr("locus_quarter_app.adapters.googlemaps.Client", _FakeGoogleClient)
+    client = GoogleMapsClient("fake-key")
+    try:
+        client.geocode("Nowhere")
+    except ValueError as exc:
+        assert "No geocode result" in str(exc)
+    else:  # pragma: no cover - defensive
+        raise AssertionError("Expected ValueError for empty geocode result")

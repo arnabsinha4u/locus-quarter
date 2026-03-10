@@ -41,7 +41,7 @@ class GmailClient(MailClient):
                 creds = flow.run_local_server(port=0)
             with open(token_path, "w", encoding="utf-8") as token_file:
                 token_file.write(creds.to_json())
-        if creds is None:
+        if creds is None:  # pragma: no cover - defensive
             raise RuntimeError("Unable to acquire Gmail credentials")
         return creds
 

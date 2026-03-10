@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from locus_quarter_app.config import ConfigError, ConfigLoader, resolve_env_value
+from locus_quarter_app.config import _parse_list, _required, ConfigError, ConfigLoader, resolve_env_value
 
 
 def test_config_loader_resolves_env_map_key(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -34,6 +34,26 @@ g_google_maps_client_api_key = env:LQ_GOOGLE_MAPS_API_KEY
         ConfigLoader(str(bad)).load()
 
 
+def test_config_loader_raises_for_missing_file() -> None:
+    with pytest.raises(ConfigError):
+        ConfigLoader("does-not-exist.ini").load()
+
+
+def test_parse_list_rejects_non_list() -> None:
+    with pytest.raises(ConfigError):
+        _parse_list("{'a': 1}", "bad_option")
+
+
+def test_parse_list_rejects_non_string_items() -> None:
+    with pytest.raises(ConfigError):
+        _parse_list("[1, 2, 3]", "bad_option")
+
+
+def test_required_raises_when_empty() -> None:
+    with pytest.raises(ConfigError):
+        _required(None, "maps_api_key")
+
+
 @pytest.mark.parametrize(
     ("raw_value", "env_value", "expected"),
     [
@@ -50,3 +70,7 @@ def test_resolve_env_value(
 ) -> None:
     monkeypatch.setenv("MY_VAR", env_value)
     assert resolve_env_value(raw_value, "MY_VAR") == expected
+
+
+def test_resolve_env_value_with_none_and_no_default() -> None:
+    assert resolve_env_value(None, None) is None

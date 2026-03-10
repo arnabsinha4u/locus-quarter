@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 import logging
-import sys
 
 import click
 from locus_quarter_app.adapters import FeedParserClient, GoogleMapsClient
@@ -88,10 +87,10 @@ def main(
         raise SystemExit(2) from exc
     except Exception as exc:  # pragma: no cover - defensive wrapper
         logger.error("Unhandled execution error: %s", exc)
-        if "--format" in sys.argv and "json" in sys.argv:
+        if output_format == "json":
             click.echo(json.dumps({"error": str(exc)}))
         raise SystemExit(1) from exc
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()
